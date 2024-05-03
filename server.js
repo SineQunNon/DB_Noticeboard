@@ -28,9 +28,13 @@ app.post('/signup', (req, res)=>{
     console.log("서버 접속! 전달 받은 데이터 : ")
     console.log(accountData)
 
-    const sql = 'test'
+    const userData = [
+        [accountData.user_name, accountData.user_id, accountData.user_pw, accountData.phone_number, accountData.address]
+    ];
 
-    db.query(sql, accountData, (err, result)=>{
+    const sql = 'INSERT INTO USER (user_name, user_id, user_pw, phone_number, address) VALUES ?'
+
+    db.query(sql, [userData], (err, result)=>{
         if(err){
             console.error('회원가입에 실패했습니다: ', err.message)
             res.status(500).json({ success: false, message: '회원가입에 실패했습니다.' });
@@ -44,12 +48,13 @@ app.post('/signup', (req, res)=>{
 //로그인 기능
 app.post('/login', (req, res)=>{
     console.log("로그인 요청 받음")
-    const { 아이디, 비밀빈호 } = req.body
-
+    console.log(req.body)
+    const id = req.body.id
+    const pw = req.body.pw
     //db에서 아이디 비밀번호 검색
     db.query(
         'SELECT * FROM USER WHERE USER_ID = ? AND USER_PW = ?;',
-        [아이디, 비밀번호],
+        [id, pw],
         (err, rows)=>{
             if(err) {
                 console.error('Error Executing query: ', err)
