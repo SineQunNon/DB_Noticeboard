@@ -1,10 +1,9 @@
 const express = require('express')
-const bodyParser = require('body-parser');
 const mysql = require('mysql')
 const app = express()
 const PORT = 3000
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 const db = mysql.createPool({
     host: 'localhost',
@@ -26,10 +25,10 @@ db.getConnection((err, connection)=>{
 //회원가입 기능
 app.post('/signup', (req, res)=>{
     const accountData = req.body
-    console.log("계정 데이터")
+    console.log("서버 접속! 전달 받은 데이터 : ")
     console.log(accountData)
 
-    const sql = 'INSERT INTO user(user_name,user_id,user_pw,phone_number,address) SET ?'
+    const sql = 'test'
 
     db.query(sql, accountData, (err, result)=>{
         if(err){
@@ -65,4 +64,8 @@ app.post('/login', (req, res)=>{
                 res.josn({success:false, message:'아이디 및 비밀번호를 확인하세요.'})
             }
     })
+})
+
+app.listen(PORT, () => {
+    console.log(`서버가 http://localhost:${PORT}에서 실행중입니다.`)
 })
