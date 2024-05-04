@@ -27,7 +27,7 @@ app.listen(3000, () => {
     console.log(`서버가 http://localhost:3000에서 실행중입니다.`);
 });
 
-//회원가입 기능
+/*--------------------------------- 회원 가입 ---------------------------------*/
 app.post('/signup', (req, res)=>{
     const accountData = req.body
     console.log("서버 접속! 전달 받은 데이터 : ")
@@ -50,7 +50,12 @@ app.post('/signup', (req, res)=>{
     })
 })
 
-//로그인 기능
+
+
+
+
+
+/*--------------------------------- 로그인 ---------------------------------*/
 app.post('/login', (req, res)=>{
     console.log("로그인 요청 받음")
     console.log(req.body)
@@ -77,6 +82,12 @@ app.post('/login', (req, res)=>{
     })
 })
 
+
+
+
+
+
+/*--------------------------------- 전체 글 조회 ---------------------------------*/
 //전체 글 조회(n개 단위 조회/페이징)
 //내용/댓글 제외한 모든 내용을 리스트로 확인
 app.get('/pagelist', (req, res) => {
@@ -104,7 +115,11 @@ app.get('/pagelist', (req, res) => {
     });
 });
 
-//게시 글 작성
+
+
+
+
+/*--------------------------------- 게시글 작성 ---------------------------------*/
 app.post('/writepost', (req, res) =>{
     console.log("게시글 작성 into")
     console.log(req.body)
@@ -121,6 +136,78 @@ app.post('/writepost', (req, res) =>{
         }else{
             console.log('게시글 작성 성공:', postData);
             res.status(201).json({ success: true, message: '게시글 작성 성공했습니다.' });
+        }
+    })
+})
+
+
+
+
+/*--------------------------------- 게시글 삭제 ---------------------------------*/
+app.post('/deletepost', (req, res)=>{
+    console.log("게시 글 삭제 into")
+    console.log(req.body)
+    const post_id = parseInt(req.body.post_id)
+    const sql = "DELETE FROM post WHERE post_id = ?"
+
+    db.query(sql, post_id, (err) => {
+        if(err){
+            console.error('게시글 삭제 실패', err.message)
+            res.status(500).json({ success: false, message: '게시글 삭제를 실패했습니다.' });
+        }else{
+            console.log('게시글 삭제 성공:', post_id);
+            res.status(201).json({ success: true, message: '게시글 삭제를 성공했습니다.' });
+        }
+    })
+})
+
+
+
+
+
+/*--------------------------------- 댓글 작성 ---------------------------------*/
+app.post('/writecomment', (req, res) => {
+    console.log("댓글 작성 into")
+    console.log(req.body)
+    const post_id = parseInt(req.body.post_id)
+    const pk_id = parseInt(req.body.pk_id)
+    
+    const commentData = [
+        [post_id ,pk_id, req.body.comment_detail]
+    ]
+    console.log(commentData)
+    const sql = "INSERT INTO COMMENTS (post_id, pk_id, comment_detail) VALUES ?"
+
+    db.query(sql, [commentData], (err) =>{
+        if(err){
+            console.error('댓글 작성 실패', err.message)
+            res.status(500).json({ success: false, message: '댓글 작성을 실패했습니다.' });
+        }else{
+            console.log('댓글 작성 성공:', post_id);
+            res.status(201).json({ success: true, message: '댓글 작성을 성공했습니다.' });
+        }
+    })
+})
+
+
+
+
+/*--------------------------------- 댓글 삭제 ---------------------------------*/
+app.post('/deletecomment', (req, res)=>{
+    console.log("댓글 삭제 into")
+    console.log(req.body)
+    const comment_id = parseInt(req.body.comment_id)
+
+    
+    const sql = "DELETE FROM comments WHERE comment_id = ?"
+
+    db.query(sql, [comment_id], (err) => {
+        if(err){
+            console.error('댓글 삭제 실패', err.message)
+            res.status(500).json({ success: false, message: '댓글 삭제를 실패했습니다.' });
+        }else{
+            console.log('댓글 삭제 성공:', comment_id);
+            res.status(201).json({ success: true, message: '댓글 삭제를 성공했습니다.' });
         }
     })
 })
