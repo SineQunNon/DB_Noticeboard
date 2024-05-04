@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-function SignUpForm() {
-
-  
+function NoticeForm() {
   /*--------------------------------- 회원 가입 ---------------------------------*/
   const [userData, setUserData] = useState({
     user_name: '',
@@ -258,6 +256,35 @@ function SignUpForm() {
 
 
 
+/*--------------------------------- 게시글 상세 조회 ---------------------------------*/
+  const [onePostData, setOnePostData] = useState({
+    pk_id : '',
+    title : '',
+    post_detail : '',
+    post_id : '',
+    post_date : '',
+    like_num : '',
+    comment_list : '',
+  })
+
+  const onePostSubmit = async (e) => {
+    e.preventDefault();
+
+    if(!isSigned.is_signed){
+      console.log("로그인 필요")
+      return
+    }
+
+    try{
+      const response = await axios.post('/pageinfo', selectPost)
+      console.log(response)
+    }catch(err){
+      console.log("댓글 작성 실패 : ", err)
+    }
+  }
+
+/*--------------------------------- 게시글 상세 조회 ---------------------------------*/
+
 
 
 
@@ -285,7 +312,7 @@ function SignUpForm() {
       <div></div><div></div>
       <button type="button" onClick={() => handlePageChange(-1)}>이전 페이지</button>
       <button type="button" onClick={() => handlePageChange(1)}>다음 페이지</button>
-      <button type="button" onClick={fetchPosts}>조회</button>
+      <button type="button" onClick={fetchPosts}>게시글 전체 조회</button>
       <ul>
         {posts.map((post, index) => (
           <li key={index}>{post.title}</li>
@@ -311,9 +338,13 @@ function SignUpForm() {
         <input type="text" name="comment_id" value={commentData.comment_id} onChange={handleCommentChange} placeholder="삭제할 댓글 comment_id"/>
         <button type="submit" onClick={commentDeleteSubmit}>댓글 삭제</button>
       </div>
+      <div>
+      <input type="text" name="post_id" value={selectPost.post_id} onChange={handleDeleteCommentChange} placeholder="상세 조회할 게시 글 post_id"/>
+        <button type="submit" onClick={onePostSubmit}>게시글 상제 조회</button>
+      </div>
     </>
   );
 }
 
-export default SignUpForm;
+export default NoticeForm;
 

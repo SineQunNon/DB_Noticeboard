@@ -87,36 +87,6 @@ app.post('/login', (req, res)=>{
 
 
 
-/*--------------------------------- 전체 글 조회 ---------------------------------*/
-//전체 글 조회(n개 단위 조회/페이징)
-//내용/댓글 제외한 모든 내용을 리스트로 확인
-app.get('/pagelist', (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const pageSize = parseInt(req.query.pageSize) || 10;
-
-    // 시작 인덱스 계산
-    const startIndex = (page - 1) * pageSize;
-
-    // SQL 쿼리문 작성
-    const sql = 'SELECT title FROM POST LIMIT ?, ?';
-
-    // 쿼리 실행
-    db.query(sql, [startIndex, pageSize], (err, rows) => {
-        if (err) {
-            console.error("글 조회 실패:", err);
-            res.status(501).json({ success: false, message: '서버 오류' });
-            return;
-        }
-        if (rows.length > 0) {
-            res.json({ rows });
-        } else {
-            res.json({ success: false, message: '더 이상 글이 없습니다.' });
-        }
-    });
-});
-
-
-
 
 
 /*--------------------------------- 게시글 작성 ---------------------------------*/
@@ -211,3 +181,67 @@ app.post('/deletecomment', (req, res)=>{
         }
     })
 })
+
+
+
+
+
+
+
+
+/*--------------------------------- 전체 글 조회 ---------------------------------*/
+//전체 글 조회(n개 단위 조회/페이징)
+//내용/댓글 제외한 모든 내용을 리스트로 확인
+app.get('/pagelist', (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
+
+    // 시작 인덱스 계산
+    const startIndex = (page - 1) * pageSize;
+
+    // SQL 쿼리문 작성
+    const sql = 'SELECT title FROM POST LIMIT ?, ?';
+
+    // 쿼리 실행
+    db.query(sql, [startIndex, pageSize], (err, rows) => {
+        if (err) {
+            console.error("글 조회 실패:", err);
+            res.status(501).json({ success: false, message: '서버 오류' });
+            return;
+        }
+        if (rows.length > 0) {
+            res.json({ rows });
+        } else {
+            res.json({ success: false, message: '더 이상 글이 없습니다.' });
+        }
+    });
+});
+
+
+
+
+
+
+
+/*--------------------------------- 게시 글 상세 조회 ---------------------------------*/
+app.get('/pageinfo', (req, res) => {
+    console.log("게시 글 상제 조회 into")
+
+    const post_id = parseInt(req.body.post_id)
+    const sql = 'SELECT *\
+                FROM post, comments, user\
+                WHERE post.post_id = comments.post_id AND post.pk_id = user.pk_id\
+                AND post.post_id = ?'
+    db.query(sql, [post_id], (err, rows) => {
+        if(err){
+            console.error("상세 글 조회 실패 : ", err)
+            res.status(501).json({ success: false, message: '서버 오류' })
+            return
+        }
+        if (rows.length > 0) {
+            console.log(rows)
+            res.json({ rows });
+        }
+    })
+})
+
