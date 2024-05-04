@@ -16,36 +16,57 @@ function SignUpForm() {
   })
 
   const [isSigned, setIsSigned] = useState({
-    
+    pk_id : '',
+    is_signed : false
   })
 
+
+  //회원가입 기능 호출
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // 필수 필드를 배열에 담습니다.
+    const requiredFields = ['user_name', 'user_id', 'user_pw', 'phone_number', 'address'];
+
+    // 입력 데이터가 비어 있는지 확인합니다.
+    if (requiredFields.some(field => !userData[field])) {
+        console.log("모든 필수 필드를 입력해주세요.");
+        return; // 필수 필드 중 하나라도 비어 있으면 함수를 종료합니다.
+    }
     try{
       console.log("into", userData)
       const response = await axios.post('/signup', userData)
-      console.log(response.data)
+      
+      console.log(response)
     }catch(err){
       console.log("회원가입 실패 : ", err)
     }
   }
 
-  const handleSubmit2 = async (e) => {
+
+  //로그인 기능 호출
+  const LoginSubmit = async (e) => {
     e.preventDefault();
     try{
-      console.log("into", userData)
       const response = await axios.post('/login', signData)
       console.log(response.data)
+      setIsSigned({...isSigned, pk_id:response.data.pk_id, is_signed:true})
     }catch(err){
       console.log("로그인 실패 : ", err)
     }
+  }
+
+  //로그아웃
+  const LogoutSubmit = async (e) => {
+    e.preventDefault();
+
+    setIsSigned({...isSigned, pk_id:'', is_signed:false})
   }
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setUserData({ ...userData, [name]: value });
   };
-  const handleChange2 = (event) => {
+  const LoginChange = (event) => {
     const { name, value } = event.target;
     setSignData({ ...signData, [name]: value });
   };
@@ -63,12 +84,13 @@ function SignUpForm() {
         </form>
       </div>
       <div>
-        <form onSubmit={handleSubmit2}>
-          <input type="text" name='id' value={signData.id} onChange={handleChange2} placeholder="아이디"/>
-          <input type="text" name='pw' value={signData.pw} onChange={handleChange2} placeholder="비밀번호"/>
+        <form onSubmit={LoginSubmit}>
+          <input type="text" name='id' value={signData.id} onChange={LoginChange} placeholder="아이디"/>
+          <input type="text" name='pw' value={signData.pw} onChange={LoginChange} placeholder="비밀번호"/>
           <button type="submit">로그인</button>
         </form>
       </div>
+        <button type="submit" onClick={LogoutSubmit}>로그아웃</button>
     </>
   );
 }

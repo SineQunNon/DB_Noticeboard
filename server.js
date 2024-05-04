@@ -1,9 +1,10 @@
 const express = require('express')
 const mysql = require('mysql')
 const app = express()
-const PORT = 3000
+const cors = require('cors');
 
 app.use(express.json());
+app.use(cors());
 
 const db = mysql.createPool({
     host: 'localhost',
@@ -62,15 +63,16 @@ app.post('/login', (req, res)=>{
                 return
             }
             if (rows.length > 0){
-                let user_pk = rows[0].PK_ID
-
-                res.json({user_pk})
+                let pk_id = rows[0].pk_id
+                console.log(rows[0])
+                console.log(rows[0].pk_id)
+                res.json({pk_id})
             }else{
                 res.josn({success:false, message:'아이디 및 비밀번호를 확인하세요.'})
             }
     })
 })
 
-app.listen(PORT, () => {
-    console.log(`서버가 http://localhost:${PORT}에서 실행중입니다.`)
-})
+app.listen(3000, () => {
+    console.log(`서버가 http://localhost:3000에서 실행중입니다.`);
+});
