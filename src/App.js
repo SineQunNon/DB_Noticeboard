@@ -129,6 +129,25 @@ function SignUpForm() {
   const handlePostChange = (e) => {
     const { name, value }= e.target
     setPostData({ ...postData, [name]: value });
+  }
+
+  const [selectPost, setSelectPost] = useState({
+    post_id : 4
+  })
+
+  const deleteSubmit = async (e) => {
+    e.preventDefault();
+    if(!isSigned.is_signed){
+      console.log("로그인 필요")
+      return
+    }
+    
+    try{
+      const response = await axios.post('/deletepost', selectPost)
+      console.log(response)
+    }catch(err){
+      console.log("게시글 삭제 실패 : ", err)
+    }
 
   }
 
@@ -169,6 +188,7 @@ function SignUpForm() {
           <button type="submit">게시글 작성</button>
         </form>
       </div>
+        <button type="submit" onClick={deleteSubmit}>게시글 삭제</button>
     </>
   );
 }

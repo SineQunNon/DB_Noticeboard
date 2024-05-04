@@ -124,3 +124,22 @@ app.post('/writepost', (req, res) =>{
         }
     })
 })
+
+//게시 글 삭제
+app.post('/deletepost', (req, res)=>{
+    console.log("게시 글 삭제 into")
+    console.log(req.body)
+    const post_id = parseInt(req.body.post_id)
+    const sql = "DELETE FROM post WHERE post_id = ?"
+
+    db.query(sql, post_id, (err) => {
+        if(err){
+            console.error('게시글 삭제 실패', err.message)
+            res.status(500).json({ success: false, message: '게시글 삭제를 실패했습니다.' });
+        }else{
+            console.log('게시글 삭제 성공:', post_id);
+            res.status(201).json({ success: true, message: '게시글 삭제를 성공했습니다.' });
+        }
+    })
+})
+
