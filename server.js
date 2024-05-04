@@ -23,6 +23,10 @@ db.getConnection((err, connection)=>{
     connection.release()
 })
 
+app.listen(3000, () => {
+    console.log(`서버가 http://localhost:3000에서 실행중입니다.`);
+});
+
 //회원가입 기능
 app.post('/signup', (req, res)=>{
     const accountData = req.body
@@ -73,6 +77,50 @@ app.post('/login', (req, res)=>{
     })
 })
 
-app.listen(3000, () => {
-    console.log(`서버가 http://localhost:3000에서 실행중입니다.`);
+//전체 글 조회(n개 단위 조회/페이징)
+//내용/댓글 제외한 모든 내용을 리스트로 확인
+app.get('/pagelist', (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
+
+    // 시작 인덱스 계산
+    const startIndex = (page - 1) * pageSize;
+
+    // SQL 쿼리문 작성
+    const sql = 'SELECT title FROM POST LIMIT ?, ?';
+
+    // 쿼리 실행
+    db.query(sql, [startIndex, pageSize], (err, rows) => {
+        if (err) {
+            console.error("글 조회 실패:", err);
+            res.status(501).json({ success: false, message: '서버 오류' });
+            return;
+        }
+        if (rows.length > 0) {
+            res.json({ rows });
+        } else {
+            res.json({ success: false, message: '더 이상 글이 없습니다.' });
+        }
+    });
 });
+
+//게시 글 작성
+app.post('/writepost', (req, res) =>{
+    console.log("게시글 작성 into")
+    console.log(req.body)
+    const pk_id = parseInt(req.body.pk_id)
+    const postData = [
+        [pk_id, req.body.title, req.body.post_detail]
+    ]
+    const sql = "INSERT INTO POST (pk_id, title, post_detail) VALUES ?"
+
+    db.query(sql, [postData], (err)=>{
+        if(err){
+            console.error('게시글 작성 실패', err.message)
+            res.status(500).json({ success: false, message: '게시글 작성에 실패했습니다.' });
+        }else{
+            console.log('게시글 작성 성공:', postData);
+            res.status(201).json({ success: true, message: '게시글 작성 성공했습니다.' });
+        }
+    })
+})
