@@ -96,34 +96,6 @@ function NoticeForm() {
 
 
 
-
-
-  /*--------------------------------- 전체 글 조회 ---------------------------------*/
-  const [page, setPage] = useState(1); // 현재 페이지 번호
-  const [pageSize, setPageSize] = useState(10); // 페이지 당 항목 수
-  const [posts, setPosts] = useState([]); // 페이지의 게시물 목록
-  // 페이지의 게시물 목록을 불러오는 함수
-  const fetchPosts = async () => {
-    if(!isSigned.is_signed){
-      console.log("로그인 필요")
-      return
-    }
-    try {
-      const response = await axios.get(`/pagelist?page=${page}&pageSize=${pageSize}`);
-      setPosts(response.data.rows);
-    } catch (err) {
-      console.error("페이지 조회 실패:", err);
-    }
-  };
-
-  const handlePageChange = (increment) => {
-    setPage(page + increment);
-  };
-
-  const handlePageSizeChange = (event) => {
-    setPageSize(parseInt(event.target.value, 10));
-  };
-  /*--------------------------------- 전체 글 조회 ---------------------------------*/
   
   
   
@@ -256,7 +228,51 @@ function NoticeForm() {
 
 
 
+
+
+
+  /*--------------------------------- 전체 글 조회 ---------------------------------*/
+  const [page, setPage] = useState(1); // 현재 페이지 번호
+  const [pageSize, setPageSize] = useState(10); // 페이지 당 항목 수
+  const [posts, setPosts] = useState([]); // 페이지의 게시물 목록
+  // 페이지의 게시물 목록을 불러오는 함수
+  const fetchPosts = async () => {
+    if(!isSigned.is_signed){
+      console.log("로그인 필요")
+      return
+    }
+    try {
+      const response = await axios.get(`/pagelist?page=${page}&pageSize=${pageSize}`);
+      setPosts(response.data.rows);
+    } catch (err) {
+      console.error("페이지 조회 실패:", err);
+    }
+  };
+
+  const handlePageChange = (increment) => {
+    setPage(page + increment);
+  };
+
+  const handlePageSizeChange = (event) => {
+    setPageSize(parseInt(event.target.value, 10));
+  };
+  /*--------------------------------- 전체 글 조회 ---------------------------------*/
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*--------------------------------- 게시글 상세 조회 ---------------------------------*/
+
+  
   const [onePostData, setOnePostData] = useState({
     pk_id : '',
     title : '',
@@ -274,12 +290,13 @@ function NoticeForm() {
       console.log("로그인 필요")
       return
     }
-
+    let post_id = selectPost.post_id
     try{
-      const response = await axios.post('/pageinfo', selectPost)
+      const response = await axios.get(`/pageinfo?post_id=${post_id}`)
+      
       console.log(response)
     }catch(err){
-      console.log("댓글 작성 실패 : ", err)
+      console.log("게시글 상세 조회 실패 : ", err)
     }
   }
 

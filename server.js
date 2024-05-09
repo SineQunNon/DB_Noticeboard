@@ -225,13 +225,16 @@ app.get('/pagelist', (req, res) => {
 
 /*--------------------------------- 게시 글 상세 조회 ---------------------------------*/
 app.get('/pageinfo', (req, res) => {
-    console.log("게시 글 상제 조회 into")
+    console.log("게시 글 상세 조회 into : ", req.query)
 
-    const post_id = parseInt(req.body.post_id)
+    const post_id = parseInt(req.query.post_id)
+
     const sql = 'SELECT *\
-                FROM post, comments, user\
-                WHERE post.post_id = comments.post_id AND post.pk_id = user.pk_id\
-                AND post.post_id = ?'
+                FROM post AS p\
+                JOIN comments AS c ON p.post_id = c.post_id\
+                JOIN user AS u ON p.pk_id = u.pk_id\
+                WHERE p.post_id = ?'
+
     db.query(sql, [post_id], (err, rows) => {
         if(err){
             console.error("상세 글 조회 실패 : ", err)
@@ -240,7 +243,9 @@ app.get('/pageinfo', (req, res) => {
         }
         if (rows.length > 0) {
             console.log(rows)
-            res.json({ rows });
+            res.json({rows});
+        }else{
+            console.log("데이터를 찾지 못함")
         }
     })
 })
