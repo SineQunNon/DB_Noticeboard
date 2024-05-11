@@ -233,7 +233,7 @@ function NoticeForm() {
 
   /*--------------------------------- 전체 글 조회 ---------------------------------*/
   const [page, setPage] = useState(1); // 현재 페이지 번호
-  const [pageSize, setPageSize] = useState(10); // 페이지 당 항목 수
+  const [pageSize, setPageSize] = useState(5); // 페이지 당 항목 수
   const [posts, setPosts] = useState([]); // 페이지의 게시물 목록
   // 페이지의 게시물 목록을 불러오는 함수
   const fetchPosts = async () => {
@@ -331,9 +331,14 @@ function NoticeForm() {
       <button type="button" onClick={() => handlePageChange(1)}>다음 페이지</button>
       <button type="button" onClick={fetchPosts}>게시글 전체 조회</button>
       <ul>
-        {posts.map((post, index) => (
-          <li key={index}>{post.title}</li>
-        ))}
+      {posts.map((post, index) => (
+        <li key={index}>
+          <div>Title: {post.title}</div>
+          <div>Like Number: {post.like_num}</div>
+          <div>Post Date: {post.post_date}</div>
+          <div>User Name: {post.user_name}</div>
+        </li>
+      ))}
       </ul>
 
       <div>

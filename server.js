@@ -11,7 +11,7 @@ const db = mysql.createPool({
     port: '3306',
     user: 'root',
     password: 'ibdp',
-    database : '20193061_Noticeboard'
+    database : '20193061_noticeboard'
 })
 
 db.getConnection((err, connection)=>{
@@ -39,7 +39,7 @@ app.post('/signup', (req, res)=>{
 
     const sql = 'INSERT INTO USER (user_name, user_id, user_pw, phone_number, address) VALUES ?'
 
-    db.query(sql, [userData], (err, result)=>{
+    db.query(sql, [userData], (err)=>{
         if(err){
             console.error('회원가입에 실패했습니다: ', err.message)
             res.status(500).json({ success: false, message: '회원가입에 실패했습니다.' });
@@ -61,16 +61,18 @@ app.post('/login', (req, res)=>{
     console.log(req.body)
     const id = req.body.id
     const pw = req.body.pw
+
     //db에서 아이디 비밀번호 검색
     db.query(
         'SELECT * FROM USER WHERE USER_ID = ? AND USER_PW = ?;',
         [id, pw],
         (err, rows)=>{
-            if(err) {
-                console.error('Error Executing query: ', err)
-                res.status(501).json({success : false, message: '서버 오류'})
-                return
-            }
+            // if(err) {
+            //     console.error('Error Executing query: ', err)
+            //     res.status(501).json({success : false, message: '서버 오류'})
+            //     return
+            // }
+
             if (rows.length > 0){
                 let pk_id = rows[0].pk_id
                 console.log(rows[0])
@@ -167,7 +169,6 @@ app.post('/deletecomment', (req, res)=>{
     console.log("댓글 삭제 into")
     console.log(req.body)
     const comment_id = parseInt(req.body.comment_id)
-
     
     const sql = "DELETE FROM comments WHERE comment_id = ?"
 
@@ -200,7 +201,9 @@ app.get('/pagelist', (req, res) => {
     const startIndex = (page - 1) * pageSize;
 
     // SQL 쿼리문 작성
-    const sql = 'SELECT title FROM POST LIMIT ?, ?';
+    const sql = 'SELECT p.title, p.like_num, p.post_date, u.user_name \
+                FROM POST AS p JOIN user AS u ON p.pk_id=u.pk_id \
+                LIMIT ?, ?';
 
     // 쿼리 실행
     db.query(sql, [startIndex, pageSize], (err, rows) => {
@@ -211,6 +214,7 @@ app.get('/pagelist', (req, res) => {
         }
         if (rows.length > 0) {
             res.json({ rows });
+            console.log(rows)
         } else {
             res.json({ success: false, message: '더 이상 글이 없습니다.' });
         }
@@ -231,7 +235,7 @@ app.get('/pageinfo', (req, res) => {
 
     const sql = 'SELECT *\
                 FROM post AS p\
-                JOIN comments AS c ON p.post_id = c.post_id\
+                LEFT JOIN comments AS c ON p.post_id = c.post_id\
                 JOIN user AS u ON p.pk_id = u.pk_id\
                 WHERE p.post_id = ?'
 
