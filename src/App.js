@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import $ from 'jquery';
 
 function NoticeForm() {
   /*--------------------------------- 회원 가입 ---------------------------------*/
@@ -22,14 +23,21 @@ function NoticeForm() {
         console.log("모든 필수 필드를 입력해주세요.");
         return; // 필수 필드 중 하나라도 비어 있으면 함수를 종료합니다.
     }
-    try{
-      console.log("into", userData)
-      const response = await axios.post('/signup', userData)
-      
-      console.log(response)
-    }catch(err){
-      console.log("회원가입 실패 : ", err)
-    }
+
+    $.ajax({
+      url: '/signup',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(userData),
+      success: function(response) {
+        console.log('회원가입 성공:', response);
+        alert('회원가입에 성공했습니다.');
+      },
+      error: function(err) {
+        console.error('회원가입 실패:', err);
+        alert('회원가입에 실패했습니다.');
+      }
+    });
   }
   /*--------------------------------- 회원 가입 ---------------------------------*/
 
@@ -64,13 +72,29 @@ function NoticeForm() {
   //로그인 기능 호출
   const LoginSubmit = async (e) => {
     e.preventDefault();
-    try{
-      const response = await axios.post('/login', signData)
-      console.log(response.data)
-      setIsSigned({...isSigned, pk_id:response.data.pk_id, is_signed:true})
-    }catch(err){
-      console.log("로그인 실패 : ", err)
-    }
+
+    $.ajax({
+      url: 'login',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(signData),
+      success: function(response){
+        console.log("로그인 성공: ", response)
+        setIsSigned({...isSigned, pk_id: response.pk_id, is_signed: true})
+      },
+      error:function(err){
+        console.error('로그인 실패: ', err)
+        alert('로그인 실패')
+      }
+    })
+
+    //try{
+    //  const response = await axios.post('/login', signData)
+    //  console.log(response.data)
+    //  setIsSigned({...isSigned, pk_id:response.data.pk_id, is_signed:true})
+    //}catch(err){
+    //  console.log("로그인 실패 : ", err)
+    //}
   }
 
   const LoginChange = (event) => {
@@ -117,7 +141,20 @@ function NoticeForm() {
     }else{
       setPostData(prevData => ({ ...prevData, pk_id: isSigned.pk_id }))
     }
-
+    
+    $.ajax({
+      url: 'writepost',
+      type: 'post',
+      contentType: 'application/json',
+      data: JSON.stringify(postData),
+      success: function(response){
+        console.log('게시글 작성 성공: ',response)
+      },
+      error:function(err){
+        console.error('게시글 작성 실패: ',err)
+      }
+    })
+    /*
     try{
       console.log(isSigned.pk_id)
       const response = await axios.post('/writepost', postData)
@@ -125,6 +162,7 @@ function NoticeForm() {
     }catch(err){
       console.log("게시글 작성 실패 : ", err)
     }
+    */
   }
 
   const handlePostChange = (e) => {
@@ -156,12 +194,27 @@ function NoticeForm() {
       return
     }
     
+    $.ajax({
+      url: 'deletepost',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(selectPost),
+      success: function(response){
+        console.log("게시글 삭제 성공: ", response)
+      },
+      error:function(err){
+        console.err("게시글 삭제 실패: ", err)
+      }
+    })
+
+    /*
     try{
       const response = await axios.post('/deletepost', selectPost)
       console.log(response)
     }catch(err){
       console.log("게시글 삭제 실패 : ", err)
     }
+    */
   }
   /*--------------------------------- 게시글 삭제 ---------------------------------*/
 
@@ -192,12 +245,27 @@ function NoticeForm() {
       return
     }
 
+    $.ajax({
+      url: 'writecomment',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(commentData),
+      success: function(response){
+        console.log("댓글 작성 성공: ", response)
+      },
+      error:function(err){
+        console.error("댓글 작성 실패: ", err)
+      }
+    })
+
+    /*
     try{
       const response = await axios.post('/writecomment', commentData)
       console.log(response)
     }catch(err){
       console.log("댓글 작성 실패 : ", err)
     }
+    */
   }
   /*--------------------------------- 댓글 작성 ---------------------------------*/
 
@@ -215,12 +283,27 @@ function NoticeForm() {
       return
     }
 
+    $.ajax({
+      url: 'deletecomment',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(commentData),
+      success: function(response){
+        console.log("댓글 삭제 성공: ", response)
+      },
+      error:function(err){
+        console.error('댓글 삭제 실패: ', err)
+      }
+    })
+
+    /*
     try{
       const response = await axios.post('/deletecomment', commentData)
       console.log(response)
     }catch(err){
       console.log("댓글 작성 실패 : ", err)
     }
+    */
   }
   /*--------------------------------- 댓글 삭제 ---------------------------------*/
 
@@ -241,12 +324,25 @@ function NoticeForm() {
       console.log("로그인 필요")
       return
     }
+
+    $.ajax({
+      url: `/pagelist?page=${page}&pageSize=${pageSize}`,
+      type: "GET",
+      success: function(response) {
+        setPosts(response.rows);
+      },
+      error: function(err) {
+        console.error("페이지 조회 실패:", err);
+      }
+    });
+    /*
     try {
       const response = await axios.get(`/pagelist?page=${page}&pageSize=${pageSize}`);
       setPosts(response.data.rows);
     } catch (err) {
       console.error("페이지 조회 실패:", err);
     }
+    */
   };
 
   const handlePageChange = (increment) => {
@@ -291,6 +387,20 @@ function NoticeForm() {
       return
     }
     let post_id = selectPost.post_id
+
+    $.ajax({
+      url: `/pageinfo?post_id=${post_id}`,
+      type: 'GET',
+      success: function(response){
+        console.log("게시글 상세조회 성공: ", response.rows)
+        setOnePostData(response.rows)
+      },
+      error: function(err){
+        console.error("게시글 상세조회 실패: ",err)
+        alert('게시글 상세 조회 실패')
+      }
+    })
+    /*
     try{
       const response = await axios.get(`/pageinfo?post_id=${post_id}`)
       
@@ -298,6 +408,7 @@ function NoticeForm() {
     }catch(err){
       console.log("게시글 상세 조회 실패 : ", err)
     }
+    */
   }
 
 /*--------------------------------- 게시글 상세 조회 ---------------------------------*/
