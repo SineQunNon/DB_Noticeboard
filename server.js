@@ -169,10 +169,11 @@ app.post('/deletecomment', (req, res)=>{
     console.log("댓글 삭제 into")
     console.log(req.body)
     const comment_id = parseInt(req.body.comment_id)
+    const pk_id = parseInt(req.body.pk_id)
     
-    const sql = "DELETE FROM comments WHERE comment_id = ?"
+    const sql = "DELETE FROM comments WHERE comment_id = ? and pk_id = ?"
 
-    db.query(sql, [comment_id], (err) => {
+    db.query(sql, [comment_id, pk_id], (err) => {
         if(err){
             console.error('댓글 삭제 실패', err.message)
             res.status(500).json({ success: false, message: '댓글 삭제를 실패했습니다.' });
@@ -201,7 +202,7 @@ app.get('/pagelist', (req, res) => {
     const startIndex = (page - 1) * pageSize;
 
     // SQL 쿼리문 작성
-    const sql = 'SELECT p.title, p.like_num, p.post_date, u.user_name \
+    const sql = 'SELECT p.post_id, p.title, p.like_num, p.post_date, u.user_name \
                 FROM POST AS p JOIN user AS u ON p.pk_id=u.pk_id \
                 LIMIT ?, ?';
 
@@ -235,7 +236,6 @@ app.get('/pageinfo', (req, res) => {
 
     const sql = 'SELECT *\
                 FROM post AS p\
-                LEFT JOIN comments AS c ON p.post_id = c.post_id\
                 JOIN user AS u ON p.pk_id = u.pk_id\
                 WHERE p.post_id = ?'
 
@@ -254,3 +254,107 @@ app.get('/pageinfo', (req, res) => {
     })
 })
 
+
+app.get('/commentslist', (req, res) => {
+    console.log("댓글 상세 조회 into : ", req.query)
+
+    const post_id = parseInt(req.query.post_id)
+
+    const sql = 'SELECT *\
+                FROM comments AS c\
+                JOIN user AS u on u.pk_id = c.pk_id\
+                WHERE post_id = ?'
+
+    db.query(sql, [post_id], (err, rows) => {
+        if(err){
+            console.error("댓글 조회 실패 : ", err)
+            res.status(501).json({ success: false, message: '서버 오류' })
+            return
+        }
+        if (rows.length > 0) {
+            console.log(rows)
+            res.json({rows});
+        }else{
+            console.log("데이터를 찾지 못함")
+        }
+    })
+})
+
+
+
+/*--------------------------------- 좋아요 ---------------------------------*/
+app.post('/updateLike', (req, res) => {
+    const post_id = parseInt(req.body.post_id);
+    const pk_id = parseInt(req.body.pk_id);
+
+    const sql = 'SELECT * FROM is_like WHERE post_id = ? AND pk_id = ?';
+
+    db.query(sql, [post_id, pk_id], (err, rows) => {
+        if (err) {
+            console.error("좋아요 업데이트 실패 : ", err);
+            res.status(501).json({ success: false, message: '서버 오류' });
+            return;
+        }
+
+        if (rows.length > 0) { // 좋아요 존재함 -> 좋아요 삭제
+            const sql2 = 'DELETE FROM is_like WHERE post_id = ? AND pk_id = ?';
+
+            db.query(sql2, [post_id, pk_id], (err, result) => {
+                if (err) {
+                    console.error("좋아요 삭제 실패 : ", err);
+                    res.status(501).json({ success: false, message: '서버 오류' });
+                    return;
+                } else {
+                    console.log("좋아요 삭제 성공");
+                    res.status(200).json({ success: true, message: '좋아요 삭제 성공' });
+                    return;
+                }
+            });
+        } else { // 좋아요 존재 X -> 좋아요 추가
+            const sql2 = 'INSERT INTO is_like (post_id, pk_id) VALUES (?, ?)';
+
+            db.query(sql2, [post_id, pk_id], (err, result) => {
+                if (err) {
+                    console.error("좋아요 추가 실패 : ", err);
+                    res.status(501).json({ success: false, message: '서버 오류' });
+                    return
+                } else {
+                    console.log("좋아요 추가 성공");
+                    res.status(200).json({ success: true, message: '좋아요 추가 성공' });
+                    return
+                }
+            });
+        }
+    });
+});
+/*--------------------------------- 좋아요 ---------------------------------*/
+
+app.post('/updateLikeNum', (req, res) => {
+    const post_id = parseInt(req.body.post_id);
+
+    const sql = "SELECT count(*) AS like_count FROM is_like WHERE post_id = ?"
+    
+    db.query(sql, [post_id], (err, result) => {
+        if(err){
+            console.log("좋아요 업데이트 실패")
+            res.status(501).json({ success: false, message: '서버 오류' });
+            return
+        }else{
+            console.log("좋아요 업데이트 성공", result)
+            const like_count = parseInt(result[0].like_count) // 좋아요 수 가져오기
+
+            const sql2 = "UPDATE post SET like_num = ? WHERE post_id = ?"
+
+            db.query(sql2, [like_count, post_id],(err, result) => {
+                if(err){
+                    console.log("좋아요 업데이트 실패")
+                    res.status(501).json({ success: false, message: '서버 오류' });
+                    return
+                }else{
+                    console.log("좋아요 업데이트 성공")
+                    return
+                }
+            })
+        }
+    })
+})
