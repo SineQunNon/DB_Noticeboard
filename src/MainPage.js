@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import { GlobalContext } from './App';
 import $ from 'jquery';
@@ -68,6 +69,7 @@ function MainPage() {
 
     /*--------------------------------- 전체 글 조회 ---------------------------------*/
     
+    
     /*--------------------------------- 로그아웃 ---------------------------------*/
     const LogoutSubmit = async (e) => {
         e.preventDefault();
@@ -76,8 +78,6 @@ function MainPage() {
         navigate('/');
     }
     /*--------------------------------- 로그아웃 ---------------------------------*/
-
-
 
 
     /*--------------------------------- 좋아요 ---------------------------------*/
@@ -104,7 +104,6 @@ function MainPage() {
                 console.error("좋아요 업데이트 실패: ", err);
             }
         });
-
     }
     
     const updateLikeNum = (postId) => {
