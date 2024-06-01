@@ -21,7 +21,7 @@ function MainPage() {
     const [page, setPage] = useState(1); // 현재 페이지 번호
     const [pageSize, setPageSize] = useState(5); // 페이지 당 항목 수
     const [posts, setPosts] = useState([]); // 페이지의 게시물 목록
-    const [totalPages, setTotalPages] = useState(0) //전체 페이지 수
+    const [totalPages, setTotalPages] = useState(0) //전체 게시글 수
 
     const handlePageChange = (increment) => {
         setPage(page + increment);
@@ -87,7 +87,6 @@ function MainPage() {
             console.log("로그인 필요");
             return;
         }
-    
         // 좋아요 업데이트 요청
         $.ajax({
             url: `/updateLike`,
@@ -121,7 +120,6 @@ function MainPage() {
             }
         });
     }
-
     /*--------------------------------- 좋아요 ---------------------------------*/
 
     return (
@@ -143,13 +141,11 @@ function MainPage() {
                 </tr>
             </thead>
             <tbody>
-                {posts.map((post, index) => (
+                {posts.map((post) => (
                 <tr key={post.post_id}>
                     <td>{post.post_id}</td>
                     {/* <td><button>게시글 상세 조회</button></td> */}
-
                     <td  onClick={() => toDetailPost(post.post_id)}>{post.title}</td>                    
-                    
                     <td>{post.post_date}</td>
                     <td>{post.user_name}</td>
                     <td>{post.like_num}</td>
@@ -158,22 +154,18 @@ function MainPage() {
                 ))}
             </tbody>
         </table>
-
-        
-            { totalPages != 0 &&(
-                <div>
-                    <button onClick={() => handlePageChange(-1)} disabled={page === 1}>이전</button>
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                            <button
-                                key={pageNum}
-                                onClick={() => setPage(pageNum)}
-                                style={{ fontWeight: page === pageNum ? 'bold' : 'normal' }}>
-                            {pageNum}
-                            </button>
-                        ))}
-                    <button onClick={() => handlePageChange(1)} disabled={page === totalPages}>다음</button>
-                </div>
-            )}
+            <div>
+                <button onClick={() => handlePageChange(-1)} disabled={page === 1}>이전</button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                        <button
+                            key={pageNum}
+                            onClick={() => setPage(pageNum)}
+                            style={{ fontWeight: page === pageNum ? 'bold' : 'normal' }}>
+                        {pageNum}
+                        </button>
+                    ))}
+                <button onClick={() => handlePageChange(1)} disabled={page === totalPages}>다음</button>
+            </div>
         </div>
     );
     }

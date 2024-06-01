@@ -267,7 +267,6 @@ app.get('/pageinfo', (req, res) => {
     })
 })
 
-
 app.get('/commentslist', (req, res) => {
     console.log("댓글 상세 조회 into : ", req.query)
 
@@ -340,8 +339,9 @@ app.post('/updateLike', (req, res) => {
         }
     });
 });
-/*--------------------------------- 좋아요 ---------------------------------*/
 
+
+/*--------------------------------- 좋아요 ---------------------------------*/
 app.post('/updateLikeNum', (req, res) => {
     const post_id = parseInt(req.body.post_id);
 
