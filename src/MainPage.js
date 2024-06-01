@@ -69,7 +69,7 @@ function MainPage() {
 
     /*--------------------------------- 전체 글 조회 ---------------------------------*/
     
-    
+
     /*--------------------------------- 로그아웃 ---------------------------------*/
     const LogoutSubmit = async (e) => {
         e.preventDefault();
@@ -147,7 +147,9 @@ function MainPage() {
                 <tr key={post.post_id}>
                     <td>{post.post_id}</td>
                     {/* <td><button>게시글 상세 조회</button></td> */}
+
                     <td  onClick={() => toDetailPost(post.post_id)}>{post.title}</td>                    
+                    
                     <td>{post.post_date}</td>
                     <td>{post.user_name}</td>
                     <td>{post.like_num}</td>
@@ -157,18 +159,21 @@ function MainPage() {
             </tbody>
         </table>
 
-        <div>
-            <button onClick={() => handlePageChange(-1)} disabled={page === 1}>이전</button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                <button
-                    key={pageNum}
-                    onClick={() => setPage(pageNum)}
-                    style={{ fontWeight: page === pageNum ? 'bold' : 'normal' }}>
-                {pageNum}
-                </button>
-            ))}
-            <button onClick={() => handlePageChange(1)} disabled={page === totalPages}>다음</button>
-        </div>
+        
+            { totalPages != 0 &&(
+                <div>
+                    <button onClick={() => handlePageChange(-1)} disabled={page === 1}>이전</button>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                            <button
+                                key={pageNum}
+                                onClick={() => setPage(pageNum)}
+                                style={{ fontWeight: page === pageNum ? 'bold' : 'normal' }}>
+                            {pageNum}
+                            </button>
+                        ))}
+                    <button onClick={() => handlePageChange(1)} disabled={page === totalPages}>다음</button>
+                </div>
+            )}
         </div>
     );
     }

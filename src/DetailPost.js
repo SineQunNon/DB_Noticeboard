@@ -18,15 +18,13 @@ function DetailPost() {
 
         const fetchDetails = async () => {
             try {
-                console.log("Fetching details for post ID:", postId); // 디버깅 로그 추가
-
                 const postResponse = await $.ajax({
                     url: `/pageinfo?post_id=${postId}`,
                     type: 'GET'
                 });
 
                 console.log("게시글 상세조회 성공: ", postResponse.rows);
-                setPost(postResponse.rows[0]); // assuming response.rows is an array
+                setPost(postResponse.rows[0]);
 
                 const commentsResponse = await $.ajax({
                     url: `/commentslist?post_id=${postId}`,
@@ -156,6 +154,7 @@ function DetailPost() {
 
     return (
         <div>
+            
             <h1>제목 : {post.title}</h1>
             <div>고유번호: {post.post_id}</div>
             <div>좋아요: {post.like_num}</div>
@@ -167,18 +166,27 @@ function DetailPost() {
             )}
             <div/>
             <h2>댓글</h2>
-            <ul>
-                {comments.map((comment, index) => (
-                    <li key={index}>
-                        <div>작성자: {comment.user_name}</div>
-                        <div>내용: {comment.comment_detail}</div>
-                        <div>작성일자: {comment.comment_date}</div>
-                        {comment.pk_id === isSigned.pk_id && (
-                            <button onClick={() => commentDeleteSubmit(comment.comment_id)}>댓글 삭제</button>
-                        )}
-                    </li>
-                ))}
-            </ul>
+            <table>
+                <thead>
+                    <tr>
+                        <th>작성자</th>
+                        <th>내용</th>
+                        <th>작성일자</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {comments.map((comment, index) =>(
+                        <tr key={index}>
+                            <td>{comment.user_name}</td>
+                            <td>{comment.comment_detail}</td>
+                            <td>{comment.comment_date}</td>
+                            <td>{comment.pk_id === isSigned.pk_id && (
+                                <button onClick={() => commentDeleteSubmit(comment.comment_id)}>댓글 삭제</button>)}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
             <div>
                 <input type="text" name="comment_detail" value={commentData.comment_detail} onChange={handleCommentChange} placeholder="댓글 내용"/>
                 <button type="submit" onClick={commentSubmit}>댓글 작성</button>
